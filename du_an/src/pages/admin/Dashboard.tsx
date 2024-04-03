@@ -7,7 +7,6 @@ type Props = {
 };
 
 const Dashboard: React.FC<Props> = ({ products }) => {
-	console.log(products);
 	return (
 		<div>
 			<h1>Hello, admin</h1>
@@ -38,7 +37,9 @@ const Dashboard: React.FC<Props> = ({ products }) => {
 							<td>{item.description}</td>
 							<td>
 								<button className="btn btn-danger">Delete</button>{' '}
-								<button className="btn btn-warning">Edit</button>
+								<Link to={`/admin/edit/${item.id}`} className="btn btn-warning">
+									Edit
+								</Link>
 							</td>
 						</tr>
 					))}

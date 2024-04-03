@@ -1,17 +1,19 @@
 import { joiResolver } from '@hookform/resolvers/joi';
 import Joi from 'joi';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { TProduct } from '~/interfaces/Product';
-import style from './Form.module.scss';
 
 const productSchema = Joi.object({
 	title: Joi.string().required().min(3).max(255),
 	price: Joi.number().required().min(0),
+	description: Joi.string().allow(null, ''),
 });
 
-const AddProduct = (props: { onAdd: (product: TProduct) => void }) => {
-	const navigate = useNavigate();
+type Props = {
+	onAdd: (product: TProduct) => void;
+};
+
+const AddProduct = ({ onAdd }: Props) => {
 	const {
 		register,
 		handleSubmit,
@@ -20,15 +22,14 @@ const AddProduct = (props: { onAdd: (product: TProduct) => void }) => {
 		resolver: joiResolver(productSchema),
 	});
 
-	const onSubmit: SubmitHandler<TProduct> = (product) => {
-		props.onAdd(product);
-		navigate('/admin');
+	const onSubmit = (product: TProduct) => {
+		onAdd(product);
 	};
 	return (
 		<div>
 			<form onSubmit={handleSubmit(onSubmit)}>
 				<h2>AddProduct</h2>
-				<div className={style.formGroup}>
+				<div className="formGroup">
 					<label htmlFor="title">Title product</label>
 					<input
 						className="form-control"
@@ -42,7 +43,7 @@ const AddProduct = (props: { onAdd: (product: TProduct) => void }) => {
 					/>
 					{errors.title && <p>{errors.title.message}</p>}
 				</div>
-				<div className={style.formGroup}>
+				<div className="formGroup">
 					<label htmlFor="price">Price product</label>
 					<input
 						className="form-control"
@@ -52,8 +53,8 @@ const AddProduct = (props: { onAdd: (product: TProduct) => void }) => {
 					/>
 					{errors.price && <p>{errors.price.message}</p>}
 				</div>
-				<div className={style.formGroup}>
-					<label htmlFor="price">Description product</label>
+				<div className="formGroup">
+					<label htmlFor="description">Description product</label>
 					<input
 						className="form-control"
 						type="text"
@@ -61,7 +62,7 @@ const AddProduct = (props: { onAdd: (product: TProduct) => void }) => {
 						{...register('description')}
 					/>
 				</div>
-				<div className={style.formGroup}>
+				<div className="formGroup">
 					<button className="btn btn-primary w-100" type="submit">
 						Add Product
 					</button>

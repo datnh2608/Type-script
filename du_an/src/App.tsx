@@ -1,20 +1,22 @@
-import { Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 import './App.css';
+import instance from './apis';
+import { createProduct } from './apis/product';
 import Footer from './components/Footer/Footer';
 import Header from './components/Header/Header';
-import Shop from './pages/ShopPage/ShopPage';
-import Login from './pages/LoginPage';
-import Register from './pages/RegisterPage';
-import Notfound from './pages/NotfoundPage';
-import ProductDetail from './pages/ProductDetailPage/ProductDetailPage';
-import Dashboard from './pages/admin/Dashboard';
-import { useEffect, useState } from 'react';
 import { TProduct } from './interfaces/Product';
-import instance from './apis';
+import Login from './pages/LoginPage';
+import Notfound from './pages/NotfoundPage/NotfoundPage';
+import ProductDetail from './pages/ProductDetailPage/ProductDetailPage';
+import Register from './pages/RegisterPage';
+import Shop from './pages/ShopPage/ShopPage';
 import AddProduct from './pages/admin/AddProduct';
-import { createProduct } from './apis/product';
+import Dashboard from './pages/admin/Dashboard';
+import EditProduct from './pages/admin/EditProduct';
 
 const App: React.FC = () => {
+	const navigate = useNavigate();
 	const [products, setProducts] = useState<TProduct[]>([]);
 
 	useEffect(() => {
@@ -25,12 +27,21 @@ const App: React.FC = () => {
 		fetchProducts();
 	}, []);
 
-	const handleSubmit = (product: TProduct) => {
-		async () => {
+	const handleAddProduct = (product: TProduct) => {
+		(async () => {
 			const data = await createProduct(product);
 			setProducts([...products, data]);
-		};
+			navigate('/admin');
+		})();
 	};
+	const handleEditProduct = (product: TProduct) => {
+		(async () => {
+			const { data } = await instance.put(`/products/${product.id}`, product);
+			setProducts(products.map((item) => (item.id === data.id ? data : item)));
+			navigate('/admin');
+		})();
+	};
+
 	return (
 		<div>
 			<Header />
@@ -46,7 +57,11 @@ const App: React.FC = () => {
 						<Route index element={<Dashboard products={products} />} />
 						<Route
 							path="/admin/add"
-							element={<AddProduct onAdd={handleSubmit} />}
+							element={<AddProduct onAdd={handleAddProduct} />}
+						/>
+						<Route
+							path="/admin/edit/:id"
+							element={<EditProduct onEdit={handleEditProduct} />}
 						/>
 					</Route>
 					<Route path="*" element={<Notfound />} />
